@@ -70,3 +70,95 @@
 
 /* TODO: implement CSS solution here */
 /* NOTE: don't forget about the JS task */
+.chat-container {
+    display: flex;
+    flex-direction: column;
+    height: 100%;
+    max-width: 800px;
+    margin: 0 auto;
+    padding: 16px;
+}
+
+.chat-container form {
+    position: relative;
+}
+
+.chat-container form input {
+    width: calc(100% - 32px);
+    margin: 32px auto;
+    display: block;
+    padding: 8px 16px;
+    border-radius: 16px;
+}
+
+.chat-container form button {
+    position: absolute;
+    right: 4px;
+    top: 39px;
+    border-radius: 16px;
+}
+
+.messages {
+    display: flex;
+    flex-flow: column nowrap;
+    height: 100%;
+}
+
+.messages > .message {
+    padding: 10px;
+    border-radius: 8px;
+    margin: 5px;
+    max-width: 300px;
+    width: fit-content;
+    word-wrap: break-word;
+}
+
+.assistant-feedback {
+    display: flex;
+    gap: 8px;
+    padding-left: 8px;
+    margin: 5px 0 16px 0;
+}
+
+.assistant-feedback button {
+    background: transparent;
+    border: none;
+    font-size: 0; 
+    cursor: pointer;
+    filter: grayscale(100%);
+    transition: filter 0.2s ease;
+}
+
+.assistant-feedback .like-button::before {
+    content: '👍';
+    font-size: 24px;
+}
+
+.assistant-feedback .dislike-button::before {
+    content: '👎';
+    font-size: 24px;
+}
+
+.assistant-feedback button.active {
+    filter: grayscale(0%);
+}
+
+.messages > .message.assistant {
+    background-color: #f0f0f0;
+}
+
+.messages > .message.user {
+    margin-left: auto;
+    background-color: #007bff;
+    color: white;
+}
+
+.message {
+    padding: 8px;
+}
+
+.message p {
+    margin: 0;
+    font-size: 14px;
+    line-height: 1.5;
+}

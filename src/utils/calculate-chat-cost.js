@@ -66,8 +66,43 @@ const ONE_USD = 355.63; // HUF
  *  * if the tokens to be counted are not from the enum the returned value is `N/A`
  */
 export function calculateChatCost(conversation, params) {
-    //
-    // TODO: your code here
-    //
-    return `0 USD`;
+    if (
+        !Array.isArray(conversation) ||
+        !params ||
+        (params.currency !== 'USD' && params.currency !== 'HUF') ||
+        !['prompt', 'completion', 'total'].includes(params.count)
+    ) {
+        return 'N/A';
+    }
+
+    let totalUsd = 0;
+
+    for (const item of conversation) {
+        const model = item.model;
+        const usage = item.usage || {};
+
+        const costData = MODEL_COST_MAP[model];
+        if (!costData) {
+            console.warn('Unknown model');
+            continue;
+        }
+
+        const promptTokens = usage.prompt_tokens || 0;
+        const completionTokens = usage.completion_tokens || 0;
+
+        if (params.count === 'prompt') {
+            totalUsd += (promptTokens / 1_000_000) * costData.input;
+        } else if (params.count === 'completion') {
+            totalUsd += (completionTokens / 1_000_000) * costData.output;
+        } else if (params.count === 'total') {
+            totalUsd += (promptTokens / 1_000_000) * costData.input +
+                        (completionTokens / 1_000_000) * costData.output;
+        }
+    }
+
+    const value = params.currency === 'HUF'
+        ? totalUsd * ONE_USD
+        : totalUsd;
+
+    return `${Number(value.toFixed(6))} ${params.currency}`;
 }
