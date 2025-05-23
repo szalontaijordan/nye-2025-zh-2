@@ -31,6 +31,7 @@ const MODEL_COST_MAP = {
 };
 
 const ONE_USD = 355.63; // HUF
+const ONE_MILLION = 1_000_000;
 
 /**
  * Calculates token costs in USD or HUF.
@@ -66,8 +67,50 @@ const ONE_USD = 355.63; // HUF
  *  * if the tokens to be counted are not from the enum the returned value is `N/A`
  */
 export function calculateChatCost(conversation, params) {
-    //
-    // TODO: your code here
-    //
-    return `0 USD`;
+    const validCurrencies = ['USD', 'HUF'];
+    const validCounts = ['prompt', 'completion', 'total'];
+
+    if (
+        !Array.isArray(conversation) ||
+        !params ||
+        !validCurrencies.includes(params.currency) ||
+        !validCounts.includes(params.count)
+    ) {
+        return "N/A";
+    }
+
+    const totalUSD = conversation
+        .map(entry => calculateSingleCost(entry, params.count))
+        .reduce((sum, cost) => sum + cost, 0);
+
+    const finalValue = params.currency === 'HUF' ? totalUSD * ONE_USD : totalUSD;
+
+    return `${finalValue.toFixed(6)} ${params.currency}`;
+}
+
+function calculateSingleCost(entry, countType) {
+    const { model, usage } = entry;
+
+    const pricing = MODEL_COST_MAP[model];
+    if (!pricing) {
+        console.warn('Unknown model');
+        return 0;
+    }
+
+    const prompt = usage?.prompt_tokens || 0;
+    const completion = usage?.completion_tokens || 0;
+
+    switch (countType) {
+        case 'prompt':
+            return (prompt / ONE_MILLION) * pricing.input;
+        case 'completion':
+            return (completion / ONE_MILLION) * pricing.output;
+        case 'total':
+            return (
+                (prompt / ONE_MILLION) * pricing.input +
+                (completion / ONE_MILLION) * pricing.output
+            );
+        default:
+            return 0;
+    }
 }

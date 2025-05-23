@@ -70,3 +70,30 @@
 
 /* TODO: implement CSS solution here */
 /* NOTE: don't forget about the JS task */
+
+.assistant-feedback button {
+    background: transparent;
+    border: none;
+    font-size: 0;
+    cursor: pointer;
+    filter: grayscale(100%);
+    transition: filter 0.2s ease;
+    padding: 4px;
+}
+
+.like-button::before,
+.dislike-button::before {
+    font-size: 20px;
+}
+
+.like-button::before {
+    content: '👍';
+}
+
+.dislike-button::before {
+    content: '👎';
+}
+
+.assistant-feedback button.active {
+    filter: grayscale(0%);
+}
