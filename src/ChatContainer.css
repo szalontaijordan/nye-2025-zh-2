@@ -70,3 +70,30 @@
 
 /* TODO: implement CSS solution here */
 /* NOTE: don't forget about the JS task */
+
+.like-button::before {
+    content: "👍";
+    font-size: 20px;
+}
+
+.dislike-button::before {
+    content: "👎";
+    font-size: 20px;
+}
+
+.like-button,
+.dislike-button {
+    font-size: 0;
+    background: none;
+    border: none;
+    cursor: pointer;
+    padding: 4px;
+}
+
+.like-button.active::before {
+    color: orange;
+}
+
+.dislike-button.active::before {
+    color: gray;
+}

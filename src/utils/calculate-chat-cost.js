@@ -66,8 +66,61 @@ const ONE_USD = 355.63; // HUF
  *  * if the tokens to be counted are not from the enum the returned value is `N/A`
  */
 export function calculateChatCost(conversation, params) {
-    //
-    // TODO: your code here
-    //
-    return `0 USD`;
+    const validCurrencies = ['USD', 'HUF'];
+    const validCounts = ['prompt', 'completion', 'total'];
+
+    if (!validCurrencies.includes(params.currency) || !validCounts.includes(params.count)) {
+        return 'N/A';
+    }
+
+    if (!Array.isArray(conversation) || conversation.length === 0) {
+        return `0 ${params.currency}`;
+    }
+
+    let totalCostUSD = 0;
+
+    for (const message of conversation) {
+        const { model, usage } = message;
+        const modelCost = MODEL_COST_MAP[model];
+
+        if (!modelCost) {
+            console.warn("Unknown model");
+            continue;
+        }
+
+        let tokens = 0;
+        let costPerMillion = 0;
+
+        switch (params.count) {
+            case 'prompt':
+                tokens = usage.prompt_tokens || 0;
+                costPerMillion = modelCost.input;
+                break;
+            case 'completion':
+                tokens = usage.completion_tokens || 0;
+                costPerMillion = modelCost.output;
+                break;
+            case 'total':
+                tokens = usage.total_tokens || 0;
+                const total = usage.total_tokens || 1;
+                const inputRatio = usage.prompt_tokens / total || 0;
+                const outputRatio = usage.completion_tokens / total || 0;
+                costPerMillion = inputRatio * modelCost.input + outputRatio * modelCost.output;
+                break;
+            default:
+                return 'N/A';
+        }
+
+        const cost = (tokens / 1_000_000) * costPerMillion;
+        totalCostUSD += cost;
+    }
+
+    let result = totalCostUSD;
+    if (params.currency === 'HUF') {
+        result *= ONE_USD;
+    }
+
+    const formatted = parseFloat(result.toFixed(6)).toString();
+
+    return `${formatted} ${params.currency}`;
 }
