@@ -66,73 +66,8 @@ const ONE_USD = 355.63; // HUF
  *  * if the tokens to be counted are not from the enum the returned value is `N/A`
  */
 export function calculateChatCost(conversation, params) {
-    const validCurrencies = ['USD', 'HUF'];
-    const validCounts = ['prompt', 'completion', 'total'];
-
-    // 1. Input Validation
-    if (!params || !validCurrencies.includes(params.currency) || !validCounts.includes(params.count)) {
-        return 'N/A';
-    }
-
-    // 2. Handle Empty Conversation
-    if (!conversation || conversation.length === 0) {
-        return `0 ${params.currency}`;
-    }
-
-    let totalCostUSD = 0;
-    const tokensPerMillion = 1_000_000;
-
-    // 3. Iterate through Conversation
-    for (const message of conversation) {
-        const model = message.model;
-        const usage = message.usage;
-
-        if (!usage || typeof usage.prompt_tokens !== 'number' || typeof usage.completion_tokens !== 'number') {
-             // Skip messages without valid usage data or handle as an error if needed
-             // console.warn(`Message without valid usage data:`, message); // Kommenteld ki vagy töröld éles kódban, ha nem szükséges a figyelmeztetés a teszt miatt
-             continue;
-        }
-
-        // 4. & 5. Get Model Cost and Handle Unknown Models
-        const modelCosts = MODEL_COST_MAP[model];
-        if (!modelCosts) {
-            console.warn(`Unknown model: ${model}`);
-            // Cost is 0 for unknown models
-            continue;
-        }
-
-        // 6. & 7. Calculate Token Cost for the message
-        let messageCostUSD = 0;
-        if (params.count === 'prompt') {
-            messageCostUSD = (usage.prompt_tokens / tokensPerMillion) * modelCosts.input;
-        } else if (params.count === 'completion') {
-            messageCostUSD = (usage.completion_tokens / tokensPerMillion) * modelCosts.output;
-        } else if (params.count === 'total') {
-            // Total cost is sum of prompt tokens * input cost + completion tokens * output cost
-            messageCostUSD = (usage.prompt_tokens / tokensPerMillion) * modelCosts.input +
-                             (usage.completion_tokens / tokensPerMillion) * modelCosts.output;
-        }
-
-        // 8. Accumulate Total Cost
-        totalCostUSD += messageCostUSD;
-    }
-
-    let finalCost = totalCostUSD;
-
-    // 9. Currency Conversion
-    if (params.currency === 'HUF') {
-        finalCost = totalCostUSD * ONE_USD;
-    }
-
-    // 10. Format Output
-    // Round to max 6 decimal places. Use toFixed for precise decimal places then parse to remove trailing zeros
-    // Note: parseFloat might introduce floating point inaccuracies for very small numbers,
-    // but it's needed to remove trailing zeros as per example.
-    // A more robust solution for financial calculations might use libraries or different rounding logic.
-    let formattedCost = finalCost.toFixed(6);
-    // Remove trailing zeros and decimal point if it becomes integer after rounding
-    formattedCost = formattedCost.replace(/\.?0+$/, '');
-
-
-    return `${formattedCost} ${params.currency}`;
+    //
+    // TODO: your code here
+    //
+    return `0 USD`;
 }
