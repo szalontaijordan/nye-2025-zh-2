@@ -57,7 +57,7 @@ describe('calculateChatCost', () => {
     });
 
     it('should warn if there is an unknown model counting 0 cost', () => {
-        const result = calculateChatCost([{ model: 'unknown', usage: {} }], { currency: 'USD', count: 'total' });
+        const result = calculateChatCost([{ model: 'unknown', usage: { prompt_tokens: 1, completion_tokens: 1, total_tokens: 2 } }], { currency: 'USD', count: 'total' });
         expect(warnSpy).toBeCalledTimes(1);
         expect(result).toEqual('0 USD');
     });
